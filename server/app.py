@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
 
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from flask_cors import CORS
-from models import db, Message  # Assuming you created a Message model
+from models import db, Message  # Make sure you have a Message model with .to_dict()
 
 app = Flask(__name__)
 CORS(app)
 
+# Config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
+# Initialize DB and Migrations
 db.init_app(app)
 migrate = Migrate(app, db)
 
-# Create tables
+# Create tables if they don't exist
 with app.app_context():
     db.create_all()
 
@@ -51,7 +53,8 @@ def create_message():
 # PATCH a message by id
 @app.route('/messages/<int:id>', methods=['PATCH'])
 def update_message(id):
-    message = Message.query.get(id)
+    # Use the SQLAlchemy 2.x recommended method
+    message = db.session.get(Message, id)
     if not message:
         return jsonify({"error": "Message not found"}), 404
 
@@ -67,7 +70,8 @@ def update_message(id):
 # DELETE a message by id
 @app.route('/messages/<int:id>', methods=['DELETE'])
 def delete_message(id):
-    message = Message.query.get(id)
+    # Use the SQLAlchemy 2.x recommended method
+    message = db.session.get(Message, id)
     if not message:
         return jsonify({"error": "Message not found"}), 404
 
