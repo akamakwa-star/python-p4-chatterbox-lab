@@ -70,8 +70,7 @@ def update_message(id):
 # DELETE a message by id
 @app.route('/messages/<int:id>', methods=['DELETE'])
 def delete_message(id):
-    # Use the SQLAlchemy 2.x recommended method
-    message = db.session.get(Message, id)
+    message = Message.query.filter_by(id=id).first()
     if not message:
         return jsonify({"error": "Message not found"}), 404
 

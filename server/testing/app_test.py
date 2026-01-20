@@ -89,7 +89,12 @@ class TestApp:
         '''updates the body of a message in the database.'''
         with app.app_context():
 
-            m = Message.query.first()
+            # Create a test message first
+            test_message = Message(body="Hello 👋", username="TestUser")
+            db.session.add(test_message)
+            db.session.commit()
+
+            m = Message.query.filter_by(body="Hello 👋").first()
             id = m.id
             body = m.body
 
@@ -111,7 +116,12 @@ class TestApp:
         '''returns data for the updated message as JSON.'''
         with app.app_context():
 
-            m = Message.query.first()
+            # Create a test message first
+            test_message = Message(body="Hello 👋", username="TestUser")
+            db.session.add(test_message)
+            db.session.commit()
+
+            m = Message.query.filter_by(body="Hello 👋").first()
             id = m.id
             body = m.body
 
@@ -133,6 +143,10 @@ class TestApp:
     def test_deletes_message_from_database(self):
         '''deletes the message from the database.'''
         with app.app_context():
+
+            # Clean up any existing messages
+            Message.query.delete()
+            db.session.commit()
 
             hello_from_liza = Message(
                 body="Hello 👋",
